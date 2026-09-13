@@ -59,4 +59,40 @@ In Java, every object has a unique identity, which is typically represented by i
 
 For example, a Student object may have methods to calculate the average marks, display student information, or update the student's name. The behavior of an object is determined by the methods defined in its class.
 
+## 4. DOT operator / seperator in JAVA
+	The dot operator (.) is used to link the reference variable of an object to its fields and methods. It allows us to access the attributes and behaviors of an object.
 
+For example, if we have a Student object named student, we can access its fields like this:
+```java
+student.rno[0] = 1;
+student.marks[0] = 85.5f;
+student.name[0] = "John Doe";
+```
+* **Instance variables** -> Variables inside the object are called instance variables. Each object has its own copy of these variables, and they can hold different values for different objects.
+
+## 5. NEW keyword:
+The `new` keyword is used to create an instance of a class. It allocates memory for the object and calls the constructor to initialize it.
+
+`Student student1` -> declaring reference variable (student1) to object (Student)
+* but it does not yet create the object in memory. It only creates a reference variable that can point to an object of type Student. It is kept in **stack memory**.
+
+**`new` operator dynamically allocates memory for the object in **heap memory** and returns a reference to the newly created object.**
+
+### Hence, all class objects in java must to created dynamically using the `new` keyword.
+
+```java
+Student student = new Student();
+```
+Left side happens during  **compile time** and right side happens during **runtime**.
+
+## 6. `Student()` -> Constructor
+The `Student()` part of the expression is a constructor. A constructor is a special method that is called when an object is created. It initializes the object's state and can take parameters to set initial values for the object's attributes.
+
+Basically defines what happens when an object is created. In this case, the constructor initializes the arrays for roll numbers, marks, and names. (data allocation)
+
+`Student Rick = new Student(17, "Rick", 90.5f);`
+* **Student()** is a special type of function in class -> This is **dynamic** constructor. It is called when an object is created. It initializes the object's state and can take parameters to set initial values for the object's attributes.
+
+Now a fucntion by default has some arguments, but a constructor has no return type. It is used to initialize the object when it is created.
+
+#### What if we create our own contructor???
