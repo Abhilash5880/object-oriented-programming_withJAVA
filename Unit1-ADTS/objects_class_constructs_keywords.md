@@ -95,4 +95,174 @@ Basically defines what happens when an object is created. In this case, the cons
 
 Now a fucntion by default has some arguments, but a constructor has no return type. It is used to initialize the object when it is created.
 
-#### What if we create our own contructor???
+#### What if we create our own constructor?
+
+We can write a constructor inside the class to initialize an object's fields:
+
+```java
+class Student {
+	int rno;
+	String name;
+	float marks;
+
+	Student(int rno, String name, float marks) {
+		this.rno = rno;
+		this.name = name;
+		this.marks = marks;
+	}
+}
+```
+
+The constructor has the same name as the class and has no return type. The
+`this` keyword refers to the current object. It is useful when a constructor
+parameter has the same name as an instance variable:
+
+```java
+this.rno = rno;
+// instance variable = parameter
+```
+
+Now the constructor can be used when creating an object:
+
+```java
+Student student = new Student(17, "Rick", 90.5f);
+
+System.out.println(student.rno);    // 17
+System.out.println(student.name);  // Rick
+System.out.println(student.marks); // 90.5
+```
+
+### The default constructor rule
+
+If a class has no constructor, Java automatically provides a no-argument
+default constructor. However, if we create any constructor ourselves, Java no
+longer creates the default constructor for us.
+
+```java
+class Student {
+	int rno;
+
+	Student(int rno) {
+		this.rno = rno;
+	}
+}
+
+Student first = new Student(17); // valid
+// Student second = new Student(); // error: no no-argument constructor
+```
+
+If both forms are needed, we must define the no-argument constructor ourselves:
+
+```java
+class Student {
+	int rno;
+	String name;
+	float marks;
+
+	Student() {
+		this(0, null, 0.0f);
+	}
+
+	Student(int rno, String name, float marks) {
+		this.rno = rno;
+		this.name = name;
+		this.marks = marks;
+	}
+}
+```
+
+`this(...)` calls another constructor in the same class. It must be the first
+statement in the constructor. This is called constructor overloading because
+the class has multiple constructors with different parameter lists:
+
+```java
+Student emptyStudent = new Student();
+Student fullStudent = new Student(17, "Rick", 90.5f);
+```
+
+### Copy constructor
+
+Java does not automatically provide a copy constructor, but we can create one
+that initializes a new object using another `Student` object:
+
+```java
+class Student {
+	int rno;
+	String name;
+	float marks;
+
+	Student(int rno, String name, float marks) {
+		this.rno = rno;
+		this.name = name;
+		this.marks = marks;
+	}
+
+	Student(Student other) {
+		this(other.rno, other.name, other.marks);
+	}
+}
+
+Student original = new Student(17, "Rick", 90.5f);
+Student copy = new Student(original);
+```
+
+`original` and `copy` are two different objects. The copy constructor gives
+the new object the same initial state as the original object.
+
+### Constructor overloading
+
+Constructor overloading means defining more than one constructor in the same
+class, where each constructor has a different parameter list. Java chooses the
+matching constructor based on the arguments passed to `new Student(...)`.
+
+The `Student` class in `Student.java` has three overloaded constructors:
+
+```java
+class Student {
+	int rno;
+	float marks;
+	String name;
+
+	// 1. No-argument constructor
+	Student() {
+		this(0, null, 0.0f);
+	}
+
+	// 2. Parameterized constructor
+	Student(int rno, String name, float marks) {
+		this.rno = rno;
+		this.name = name;
+		this.marks = marks;
+	}
+
+	// 3. Copy constructor
+	Student(Student student) {
+		this(student.rno, student.name, student.marks);
+	}
+}
+```
+
+Each constructor can be called with a different argument list:
+
+```java
+Student emptyStudent = new Student();
+Student fullStudent = new Student(17, "Rick", 90.5f);
+Student copiedStudent = new Student(fullStudent);
+```
+
+The no-argument constructor delegates to the parameterized constructor using
+`this(0, null, 0.0f)`. The copy constructor also delegates to the parameterized
+constructor, passing the values from another `Student` object. This avoids
+duplicating the field-initialization code.
+
+These constructors are overloaded because their parameter lists are different:
+
+| Constructor | Parameter list | Purpose |
+| --- | --- | --- |
+| `Student()` | No parameters | Creates a student with default values |
+| `Student(int, String, float)` | Roll number, name, and marks | Creates a student with supplied values |
+| `Student(Student)` | Another `Student` object | Creates a student with copied values |
+
+Constructor overloading is resolved at compile time. It is different from
+method overriding, which happens when a subclass provides a new implementation
+of an inherited method.

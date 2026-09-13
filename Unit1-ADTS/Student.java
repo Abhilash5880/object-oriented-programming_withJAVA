@@ -1,44 +1,4 @@
-
-// public class Main {
-//     public static void main(String[] args) {
-//         // just declaring
-// //        Student kunal;
-// //        kunal = new Student();
-
-//         Student kunal = new Student(15, "Kunal Kushwaha", 85.4f);
-
-// //        kunal.rno = 13;
-// //        kunal.name = "Kunal Kushwaha";
-// //        kunal.marks = 88.5f;
-
-
-// //        kunal.changeName("Shoe lover");
-// //        kunal.greeting();
-
-// //
-//         System.out.println(kunal.rno);
-//         System.out.println(kunal.name);
-//         System.out.println(kunal.marks);
-
-//         Student random = new Student(kunal);
-//         System.out.println(random.name);
-
-//         Student random2 = new Student();
-//         System.out.println(random2.name);
-
-//         Student one = new Student();
-//         Student two = one;
-
-//         one.name = "Something something";
-
-//         System.out.println(two.name);
-
-//     }
-// }
-
-// create a class
-// for every single student
-public class Student {
+class Student {
     // create attributes
     int rno;
     float marks;
@@ -58,6 +18,13 @@ public class Student {
 
     Student(Student student) {
         this(student.rno, student.name, student.marks);
+    }
+    void greeting() {
+        System.out.println("Hello! My name is " + this.name);
+    }
+
+    void changeName(String name) {
+        this.name = name;
     }
 
     public static void main(String[] args) {
@@ -82,6 +49,10 @@ public class Student {
         System.out.println("Roll no: " + Rick.rno); //by default 0
         System.out.println("Name: " + Rick.name); //by default null
         System.out.println("Marks: " + Rick.marks); //by default 0.0f
+
+        Rick.greeting();
+        Rick.changeName("Rick Sanchez");
+        Rick.greeting();
     }
 }
 
