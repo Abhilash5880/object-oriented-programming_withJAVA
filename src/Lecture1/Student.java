@@ -1,3 +1,4 @@
+package Lecture1;
 class Student {
     // create attributes
     int rno;
