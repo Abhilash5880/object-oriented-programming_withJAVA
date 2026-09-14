@@ -263,6 +263,61 @@ These constructors are overloaded because their parameter lists are different:
 | `Student(int, String, float)` | Roll number, name, and marks | Creates a student with supplied values |
 | `Student(Student)` | Another `Student` object | Creates a student with copied values |
 
-Constructor overloading is resolved at compile time. It is different from
-method overriding, which happens when a subclass provides a new implementation
+* Constructor overloading is resolved at compile time. It is different from method overriding, which happens when a subclass provides a new implementation
 of an inherited method.
+
+### Why are primitive datatypes not implemented with `new` keyword?
+* Primitive datatypes in Java are not objects, so they cannot be instantiated with the `new` keyword. Instead, they are stored directly in memory and have default values assigned to them.
+
+* For e.g Java and Python work differently...in Python there are no primitive datatypes, everything is an object. In Java, primitive datatypes are not objects, so they cannot be instantiated with the `new` keyword. Instead, they are stored directly in memory and have default values assigned to them.
+
+# 7. WrapperClass
+
+This is a Java class that demonstrates the use of wrapper classes.
+
+### Description
+
+The `wrapperClass` class demonstrates the use of wrapper classes in Java. Wrapper classes are used to convert primitive data types into objects. The `Integer` class, which is a wrapper class for the `int` primitive data type, is used in this example.
+
+### Usage
+
+To use the `wrapperClass` class, follow these steps:
+
+1. Create an instance of the `wrapperClass` class.
+2. Call the `swap` method with two integer values to swap them.
+3. The swapped values will be printed to the console.
+
+### Example
+
+```java
+public class wrapperClass {
+    public static void main(String[] args) {
+        int a = 10;
+        int b = 20;
+        swap(a, b);
+    }
+
+    static void swap(int a, int b) {
+        int temp = a;
+        a = b;
+        b = temp;
+        System.out.println("a = " + a + ", b = " + b);
+    }
+}
+```
+
+# 8. `final` Keyword
+* The `final` keyword in Java is used to declare constants, prevent method overriding, and prevent inheritance of classes. 
+
+When a variable is declared as `final`, its value cannot be changed once it has been assigned. When a method is declared as `final`, it cannot be overridden by subclasses. When a class is declared as `final`, it cannot be subclassed.
+
+E.g -> ```final  int INCREASE=2;``` -> This means that the value of `INCREASE` cannot be changed after it has been assigned.
+
+* But it will only ensure immatability if the instance variable is of primitive datatype. If the instance variable is of reference type, then the reference cannot be changed, but the object it points to can still be modified. 
+
+E.g -> ```final Student student = new Student();``` -> This means that the reference variable `student` cannot be changed to point to a different `Student` object, but the fields of the `Student` object it points to can still be modified.
+
+# 9. Garbage Collection
+* Garbage collection is the process of automatically freeing up memory by removing objects that are no longer in use. In Java, the garbage collector is responsible for identifying and removing objects that are no longer reachable from the program.
+
+* C++ does not have automatic garbage collection, so the programmer is responsible for managing memory manually using destructors. In C++, if an object is no longer needed, the programmer must explicitly delete it to free up memory. If the programmer forgets to delete an object, it can lead to memory leaks and other issues.
