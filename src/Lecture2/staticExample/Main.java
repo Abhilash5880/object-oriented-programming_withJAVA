@@ -8,6 +8,21 @@ public class Main {
 
         System.out.println(Rick.totalPopulation);
         System.out.println(Morty.totalPopulation);
-    
+        
+        
+    }
+    static void hello()
+    {
+        //greeting();
+        //we cannot make a static method call from a non-static context, so we need to create an object of the class to call the greeting method
+        Main obj=new Main();
+        obj.greeting(); 
+        //we can also make the greeting method static to call it directly from the static context
+        
+    }
+   
+    void greeting()
+    {
+        System.out.println("Hello");
     }
 }
