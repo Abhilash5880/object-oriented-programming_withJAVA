@@ -1,9 +1,9 @@
 package Lecture1;
-class Student {
+public class Student {
     // create attributes
-    int rno;
-    float marks;
-    String name;
+    public int rno;
+    public float marks;
+    public String name;
 
     //we need a way to add values of the above attributes
     //we need 1 word to access eveyr object
@@ -11,7 +11,7 @@ class Student {
         this(0, null, 0.0f);
     }
 
-    Student(int rno, String name, float marks) {
+    public Student(int rno, String name, float marks) {
         this.rno = rno;
         this.name = name;
         this.marks = marks;
