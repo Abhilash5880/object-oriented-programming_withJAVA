@@ -6,7 +6,7 @@ public class Student {
     public String name;
 
     //we need a way to add values of the above attributes
-    //we need 1 word to access eveyr object
+    //we need 1 word to access every object
     Student() {
         this(0, null, 0.0f);
     }
