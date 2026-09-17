@@ -2,7 +2,7 @@ package Lecture5.interfaces;
 
 public class NiceCar {
 
-    priavte Engine engine;
+    private Engine engine;
     private Media player=new CDPlayer();
 
     public NiceCar()
@@ -31,6 +31,6 @@ public class NiceCar {
     }
 
     public void upgradeEngine() {
-        this.engine = new ElecticEngine();
+        this.engine = new ElectricEngine();
     }
 }

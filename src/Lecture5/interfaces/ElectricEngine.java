@@ -1,6 +1,7 @@
 package Lecture5.interfaces;
 
-public class ElecticEngine implements Engine{
+public class ElectricEngine implements Engine{
+
 
     @Override
     public void start() {

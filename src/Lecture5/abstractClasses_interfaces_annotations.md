@@ -19,12 +19,27 @@ An **abstract method** is a method that has only a declaration (signature) and *
 ### Key Rules of Abstract Classes:
 
 1. **Cannot be instantiated**: You cannot create objects using `new Parent()` ❌.
+>- Reason: Abstract classes are incomplete by design. They are meant to be subclassed, and their abstract methods must be implemented in concrete subclasses before they can be instantiated. 
+>- Creating an object of an abstract class would violate this principle, as it would allow the use of empty methods that have no implementation, which is illogical and leads to runtime errors.
+
 2. **Constructors allowed**: Even though it cannot be instantiated directly, an abstract class **can have constructors**. They are called when a subclass object is instantiated via `super()`.
+>- Reason: Constructors in abstract classes are used to initialize common properties or perform setup tasks that are shared among all subclasses. 
+>- When a subclass is instantiated, it can call the constructor of the abstract superclass to ensure that the inherited fields are properly initialized.
+
 3. **Can have normal (concrete) and `static` methods**: An abstract class does not need to be 100% abstract. It can have normal instance methods and static methods with full implementations.
+>- Reason: Abstract classes can provide default behavior through concrete methods, allowing subclasses to inherit and use these methods without needing to implement them.
+
 4. **Mandatory override**: Any concrete subclass extending an abstract class **must override all** of its abstract methods; otherwise, the subclass must also be declared `abstract`.
+>- Reason: This ensures that all abstract methods are implemented, providing complete functionality in the subclass. If a subclass does not implement all abstract methods, it remains incomplete and must also be declared abstract.
+
 5. **Cannot be `final`**: An abstract class MUST be inherited, whereas a `final` class CANNOT be inherited. Therefore, `final abstract` is illegal.
+>- Reason: The purpose of an abstract class is to serve as a base for other classes. Declaring it as `final` would contradict this purpose, as it would prevent any subclassing, making the abstract class unusable.
+
 6. **Abstract methods cannot be `static`**: Static methods cannot be overridden, but abstract methods require overriding.
+>- Reason: Abstract methods are meant to be overridden in subclasses to provide specific implementations. Static methods belong to the class itself and cannot be overridden, which conflicts with the purpose of abstract methods.
+
 7. **Abstract methods cannot be `private`**: Private methods cannot be inherited or overridden.
+>- Reason: Abstract methods are intended to be implemented by subclasses, which requires them to be accessible. Declaring an abstract method as private would prevent subclasses from accessing and overriding it, defeating the purpose of abstraction.
 
 ---
 
@@ -142,10 +157,17 @@ An **Interface** in Java is a blueprint of a class containing abstract methods a
 
 ### Key Rules of Interfaces:
 - All variables in an interface are implicitly **`public static final`** (constants).
+>- Reason: Interfaces are meant to define a contract for behavior, not state. By making variables `static` and `final`, they become constants that cannot be modified, ensuring that the interface remains a pure specification of behavior without maintaining any mutable state.
+
 - All methods are implicitly **`public abstract`** (prior to Java 8).
+
 - A class uses the **`implements`** keyword to implement an interface.
+>- Reason: The `implements` keyword clearly indicates that a class is providing concrete implementations for the abstract methods defined in the interface, establishing a contract between the interface and the implementing class.
+
 - A class must provide **`public`** implementations for all interface methods.
+>- Reason: Interface methods are implicitly public, and the implementing class must maintain this visibility to fulfill the contract defined by the interface. If the methods were not public, it would violate the interface's specification and lead to access issues.
 - The variables are **`static`** and **`final`** by default in interfaces, so they cannot be changed. They are constants. 
+>- Reason: Interfaces are meant to define a contract for behavior, not state. By making variables `static` and `final`, they become constants that cannot be modified, ensuring that the interface remains a pure specification of behavior without maintaining any mutable state.
 ---
 
 ### Code Implementation (`interfaces`)
