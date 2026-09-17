@@ -6,7 +6,8 @@ public class a {
     int[] arr;
 
      //using getters and setters to access and modify the data members
-    public int getNum() {
+    public int getNum()
+    {
         return num;
     } //this is getter -> gets hte value of the data member
     //num is not visible directly outside-> it is accessed via getter and setter methods which are public while the variable is private, in it's own class -> but a private variable can be accessed in it's own class, so we can use getter and setter methods to access it from outside the class 
