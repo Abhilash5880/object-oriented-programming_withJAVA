@@ -1,4 +1,6 @@
 package Lecture6.generics;
 
-public class GenericInterface {
+public interface GenericInterface<T>
+{
+    void display(T value);
 }
