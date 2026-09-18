@@ -2,17 +2,17 @@
 
 Abstract classes are classes that cannot be instantiated and are meant to be subclassed. They can contain both abstract methods (methods without implementation) and concrete methods (methods with implementation).
 
-The Parent class is only going to give a generalized form of it, not the body of the method. Such a class will determine the nature of the methods the subclass/child class must implement. The parent class is just giving the definition of the method, not the body of the method. **These are known as abstract methods.** 
+An abstract superclass can define a generalized form of behavior without providing an implementation for certain methods. Such methods declare what subclasses are expected to provide, but do not contain a method body. **These are known as abstract methods.** 
 
-Now when a function does not have a body, it totally depends on the child class to implement it. The child class is going to give the body of that function.
+When a method is abstract, a concrete subclass must provide its implementation. A subclass that does not implement all inherited abstract methods must itself be declared `abstract`.
 
-* This is done by **overriding**. We have to make sure the child class overrides all the methods. These are the methods that are defined in the parent class but not implemented. 
+* This is done by **overriding**. A concrete child class must implement all inherited abstract methods that it is required to implement. These are methods declared in the superclass but without an implementation. 
 
-    If we do not override all the methods, then the child class will also become an abstract class, and inorder to used them the child class must override it.
+    If a subclass does not implement all inherited abstract methods, it must also be declared `abstract`. A concrete subclass cannot be instantiated until all applicable abstract methods have implementations.
 
-**NOTE:** Any class that has at least one abstract method must also be declared as an abstract class.
+**NOTE:** Any class that declares or inherits an abstract method must be abstract (subject to the language rules for whether an inherited method has been overridden). A normal class cannot contain an abstract method declaration.
 
-# 2. Abstract Static Methods
+# 2. Abstract Methods
 An **abstract method** is a method that has only a declaration (signature) and **no body / implementation**. It ends with a semicolon `;`.
 
 
@@ -20,7 +20,7 @@ An **abstract method** is a method that has only a declaration (signature) and *
 
 1. **Cannot be instantiated**: You cannot create objects using `new Parent()` ❌.
 >- Reason: Abstract classes are incomplete by design. They are meant to be subclassed, and their abstract methods must be implemented in concrete subclasses before they can be instantiated. 
->- Creating an object of an abstract class would violate this principle, as it would allow the use of empty methods that have no implementation, which is illogical and leads to runtime errors.
+>- Java prevents this at compile time. An abstract class may contain abstract methods, so Java does not allow a direct instance of that class to be created.
 
 2. **Constructors allowed**: Even though it cannot be instantiated directly, an abstract class **can have constructors**. They are called when a subclass object is instantiated via `super()`.
 >- Reason: Constructors in abstract classes are used to initialize common properties or perform setup tasks that are shared among all subclasses. 
@@ -35,10 +35,10 @@ An **abstract method** is a method that has only a declaration (signature) and *
 5. **Cannot be `final`**: An abstract class MUST be inherited, whereas a `final` class CANNOT be inherited. Therefore, `final abstract` is illegal.
 >- Reason: The purpose of an abstract class is to serve as a base for other classes. Declaring it as `final` would contradict this purpose, as it would prevent any subclassing, making the abstract class unusable.
 
-6. **Abstract methods cannot be `static`**: Static methods cannot be overridden, but abstract methods require overriding.
+6. **Abstract methods cannot be `static`**: A static method belongs to the class rather than an object and is not overridden. An abstract method requires a concrete implementation through overriding, so the two modifiers cannot be combined.
 >- Reason: Abstract methods are meant to be overridden in subclasses to provide specific implementations. Static methods belong to the class itself and cannot be overridden, which conflicts with the purpose of abstract methods.
 
-7. **Abstract methods cannot be `private`**: Private methods cannot be inherited or overridden.
+7. **Abstract methods cannot be `private`**: Private methods are not inherited or overridden by subclasses, so a subclass cannot provide the required implementation of a private abstract method.
 >- Reason: Abstract methods are intended to be implemented by subclasses, which requires them to be accessible. Declaring an abstract method as private would prevent subclasses from accessing and overriding it, defeating the purpose of abstraction.
 
 ---
@@ -149,24 +149,24 @@ public class Main {
 ## 2. Interfaces (`interfaces`)
 
 ### What is an Interface?
-An **Interface** in Java is a blueprint of a class containing abstract methods and static constants. It specifies **what** a class must do, but not **how** it does it.
+An **interface** in Java defines a contract that classes can implement. It can declare abstract methods as well as constants, and modern Java interfaces can also contain `default`, `static`, and `private` methods with implementations. It primarily specifies **what** behavior a type exposes, while allowing implementations to determine **how** that behavior is carried out.
 
 ### Why do we need Interfaces?
-1. **Multiple Inheritance**: Java does not support multiple inheritance with classes (to avoid the "Diamond Problem"), but a class can implement **multiple interfaces**.
-2. **Total Abstraction**: Achieves 100% loose coupling.
+1. **Multiple Type Inheritance**: Java does not allow a class to extend multiple classes, but a class can implement **multiple interfaces**. This allows a class to inherit multiple interface contracts.
+2. **Abstraction and Loose Coupling**: Interfaces can help separate a contract from its implementation and can make designs more flexible. They do not automatically guarantee "100% loose coupling".
 
 ### Key Rules of Interfaces:
 - All variables in an interface are implicitly **`public static final`** (constants).
 >- Reason: Interfaces are meant to define a contract for behavior, not state. By making variables `static` and `final`, they become constants that cannot be modified, ensuring that the interface remains a pure specification of behavior without maintaining any mutable state.
 
-- All methods are implicitly **`public abstract`** (prior to Java 8).
+- Methods without `default`, `static`, or `private` are implicitly **`public abstract`**. Java 8 introduced `default` and `static` interface methods, and Java 9 introduced `private` interface methods.
 
 - A class uses the **`implements`** keyword to implement an interface.
 >- Reason: The `implements` keyword clearly indicates that a class is providing concrete implementations for the abstract methods defined in the interface, establishing a contract between the interface and the implementing class.
 
 - A class must provide **`public`** implementations for all interface methods.
 >- Reason: Interface methods are implicitly public, and the implementing class must maintain this visibility to fulfill the contract defined by the interface. If the methods were not public, it would violate the interface's specification and lead to access issues.
-- The variables are **`static`** and **`final`** by default in interfaces, so they cannot be changed. They are constants. 
+- The variables (fields) declared in an interface are implicitly **`public static final`**, so they are constants and cannot be reassigned. 
 >- Reason: Interfaces are meant to define a contract for behavior, not state. By making variables `static` and `final`, they become constants that cannot be modified, ensuring that the interface remains a pure specification of behavior without maintaining any mutable state.
 ---
 
@@ -197,7 +197,7 @@ public interface Media {
 ```java
 package Lecture5.interfaces;
 
-// Multiple inheritance achieved through interfaces
+// A class can implement multiple interfaces
 public class Car implements Engine, Brake, Media {
 
     @Override
@@ -224,11 +224,11 @@ public class Car implements Engine, Brake, Media {
 
 ---
 
-### The Flaw in Direct Interface Implementation:
-In `Car.java`, both `Engine` and `Media` have `start()` and `stop()` methods. When we call `car.start()`, it is ambiguous whether it starts the car engine or starts the media player.
+### Design Limitation of Direct Interface Implementation:
+In `Car.java`, both `Engine` and `Media` declare `start()` and `stop()`. This is **not a compile-time ambiguity** in this example: one `Car.start()` implementation can satisfy both interface contracts because the methods have the same signature. However, the design does not distinguish whether `start()` means starting the engine or starting the media player, so the API can be unclear. Composition gives the two responsibilities separate method names such as `start()` and `startMusic()`.
 
 ### Better Design Pattern: Composition over Inheritance (`NiceCar.java`)
-Instead of having `Car` implement everything directly, we inject modular engine and media components using **Composition**:
+Instead of putting all component responsibilities directly on `Car`, we can inject modular engine and media components using **Composition**:
 
 #### Supporting Implementations:
 ```java
@@ -369,22 +369,22 @@ public interface B extends A {
 
 | Feature | Abstract Class | Interface |
 | :--- | :--- | :--- |
-| **Speed** | Slightly faster | Slower due to search/lookup in implementation table |
+| **Speed** | No general language-level speed guarantee | No general language-level speed guarantee |
 | **Multiple Inheritance** | ❌ No (Single class inheritance only) | ✅ Yes (A class can implement multiple interfaces) |
 | **Variables** | Can have instance variables, `static`, `final`, etc. | Only `public static final` (constants) |
 | **Constructors** | ✅ Can have constructors (called via `super`) | ❌ Cannot have constructors |
 | **Methods** | Can have abstract, concrete, `final`, and `static` methods | Abstract methods, `default` & `static` methods (Java 8+) |
-| **Access Modifiers** | Can have `private`, `protected`, `public` | Everything is implicitly `public` |
+| **Access Modifiers** | Can have `private`, `protected`, `public` | Interface fields are `public`; ordinary interface methods are `public` by default, while `private` interface methods are also allowed |
 | **Keywords** | `abstract class`, `extends` | `interface`, `implements`, `extends` |
 
 ---
 
 ## 5. Annotations
 
-Annotations are metadata tags prefixed with `@` that provide data about a program without altering its bytecode logic directly.
+Annotations are metadata associated with program declarations or other program elements. They are prefixed with `@` and can be used by the compiler, tools, frameworks, or runtime reflection depending on the annotation's retention and target.
 
 ### Common Standard Annotations:
 1. **`@Override`**: Ensures a method is actually overriding a method from a superclass/interface; generates a compile error if the signature doesn't match.
 2. **`@Deprecated`**: Marks a method or class as obsolete, warning developers not to use it.
 3. **`@SuppressWarnings("...")`**: Instructs the compiler to suppress specific warnings (e.g. `@SuppressWarnings("unchecked")`).
-4. **`@FunctionalInterface`**: Ensures an interface has **exactly one** abstract method (used with Lambda expressions).
+4. **`@FunctionalInterface`**: Tells the compiler that the interface is intended to be a **functional interface**, meaning it has exactly one abstract method (after considering inherited methods). The compiler reports an error if that requirement is violated. Functional interfaces can be used as targets for lambda expressions and method references.

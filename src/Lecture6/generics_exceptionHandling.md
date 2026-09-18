@@ -10,14 +10,16 @@ Standard arrays in Java have a **fixed size** upon initialization. An **`ArrayLi
 ## 1. How `ArrayList` Expands Its Size
 
 When you add elements to an `ArrayList`:
-1. It maintains an internal primitive array (`int[]` or `Object[]`) with a default initial capacity (standard Java library defaults to **10**).
-2. Elements are added one by one at $O(1)$ constant time as long as space remains.
-3. **When the array becomes full (`size == data.length`)**:
-   - A new array with **double the capacity** (or $1.5\times$ in Java's native `ArrayList`) is allocated in heap memory.
-   - All existing elements are copied from the old array into the new array ($O(N)$ copy operations).
-   - The internal reference variable is updated to point to the new array.
-   - The old array is marked for garbage collection.
+1. It maintains an internal array of object references. For the standard `ArrayList<E>`, the backing array is an `Object[]`. The no-argument constructor starts with an empty backing array; capacity is grown as elements are added.
+2. Elements are added in $O(1)$ time when sufficient capacity is available.
+3. **When the current capacity is insufficient**:
+   - A larger backing array is allocated.
+   - Existing element references are copied to the new array ($O(N)$ copy operations).
+   - The internal reference is updated to point to the new array.
+   - The old array becomes eligible for garbage collection if no other references to it exist.
    - The new element is appended.
+
+> **Important:** The Java API specifies that `ArrayList.add()` has **amortized $O(1)$** time and that capacity grows automatically, but it does not specify a particular growth factor. The commonly observed growth policy is an implementation detail, not a language guarantee.
 
 #### Code Representation (`resize()` in CustomArrayList):
 ```java
@@ -91,15 +93,15 @@ Assume an initial capacity of **1**, and we insert **$N$ elements** (where $N$ i
 | Strategy | Resize Frequency | Total Copy Cost for $N$ items | Amortized Time |
 | :--- | :--- | :--- | :--- |
 | **Incremental (+1 each time)** | Every single insertion | $1 + 2 + 3 + \dots + N = \frac{N(N+1)}{2} = \mathcal{O}(N^2)$ | $\frac{\mathcal{O}(N^2)}{N} = \mathbf{\mathcal{O}(N)}$ *(Very Bad!)* |
-| **Doubling ($\times 2$ each time)** | Exponentially rarer ($1, 2, 4, 8, \dots$) | $1 + 2 + 4 + \dots + \frac{N}{2} < N$ | $\frac{2N}{N} = \mathbf{\mathcal{O}(1)}$ *(Optimal)* |
+| **Doubling ($\times 2$ each time)** | Exponentially rarer ($1, 2, 4, 8, \dots$) | $1 + 2 + 4 + \dots + \frac{N}{2} < N$ | $\frac{2N}{N} = \mathbf{\mathcal{O}(1)}$ *(Amortized constant)* |
 
 ### Key Takeaway:
-* **Worst-case time for a single `add()`**: $\mathcal{O}(N)$ (only occurs during a resize).
-* **Average / Amortized time for `add()`**: $\mathcal{O}(1)$ (over any sequence of $N$ operations).
+* **Worst-case time for a single `add()`**: $\mathcal{O}(N)$ when a resize/copy is required.
+* **Amortized time for `add()`**: $\mathcal{O}(1)$ over a sequence of insertions when the backing array grows geometrically.
 
 
 # Part 2. Generics in Java
-To implement generics, the java compiler applies type erasure, which means that the generic type information is removed at runtime. As a result, you cannot directly create an array of a generic type (e.g., new T[DEFAULT_SIZE]) because the actual type of T is not known at runtime. Instead, you can create an array of Object and then cast it to T[].
+To implement generics, the Java compiler uses **type erasure**. Generic type arguments are not retained in the same way as ordinary runtime class information. Because `T` is a type parameter rather than a reifiable runtime component type, you cannot directly create `new T[DEFAULT_SIZE]`. A common implementation technique is to use an `Object[]` as the backing array and cast individual elements to `T` when retrieving them.
 
 
 
@@ -147,7 +149,7 @@ package Lecture6.generics;
 
 import java.util.Arrays;
 
-// T is the Type Parameter (can be any Object type)
+// T is the type parameter. Generic type arguments must be reference types.
 public class CustomGenArrayList<T> {
     private Object[] data;
     private static int DEFAULT_SIZE = 10;
@@ -240,10 +242,10 @@ data = new T[DEFAULT_SIZE]; // ❌ COMPILE ERROR
 ```
 
 #### Reason: **Type Erasure**
-- In Java, Generics exist **only at compile time** for type checking.
-- When Java code is compiled to bytecode, the compiler **erases** all generic type parameters (`T` is replaced with `Object` or its bound).
-- At runtime, the JVM does not know what `T` is. Because arrays require their exact runtime component type to allocate memory, you cannot instantiate an array of an unknown generic type `T`.
-- **Solution**: Create an `Object[]` array and cast elements to `(T)` when reading them back.
+- Generic type parameters are checked by the compiler and are subject to **type erasure**.
+- During erasure, an unbounded type parameter is replaced with `Object`, while a bounded type parameter is replaced with its leftmost bound.
+- A type parameter such as `T` is not a reifiable runtime array component type, so `new T[...]` is not permitted.
+- **Common solution**: Create an `Object[]` backing array and cast retrieved elements to `T` as needed. This pattern relies on the class maintaining its type-safety invariant.
 
 ---
 
@@ -348,7 +350,7 @@ public int compareTo(T o);
 | Return Value | Meaning |
 | :--- | :--- |
 | **Negative Integer (`< 0`)** | `this` object is **smaller** than `o` (`this` comes before `o`). |
-| **Zero (`0`)** | `this` object is **equal** to `o`. |
+| **Zero (`0`)** | `this` and `o` are equivalent according to this ordering. This does **not necessarily mean** `this.equals(o)` is `true`. |
 | **Positive Integer (`> 0`)** | `this` object is **greater** than `o` (`this` comes after `o`). |
 
 ---
@@ -375,11 +377,7 @@ public class Student implements Comparable<Student> {
     // Implementing natural ordering based on marks
     @Override
     public int compareTo(Student other) {
-        int diff = (int)(this.marks - other.marks);
-        // if diff < 0: this has fewer marks than other
-        // if diff == 0: both have equal marks
-        // if diff > 0: this has more marks than other
-        return diff;
+        return Float.compare(this.marks, other.marks);
     }
 }
 ```
@@ -405,7 +403,7 @@ public class Main {
         // 2. Sorting an Array of Objects:
         Student[] list = {kunal, rahul, arpit, sachin};
 
-        // Arrays.sort() automatically uses compareTo() under the hood!
+        // Arrays.sort() uses the elements' natural ordering via compareTo().
         Arrays.sort(list);
 
         System.out.println(Arrays.toString(list));
@@ -448,13 +446,13 @@ Arrays.sort(list, new Comparator<Student>() {
 #### 2. Using Lambda Expression (Modern Java):
 ```java
 // Sort ascending by marks:
-Arrays.sort(list, (o1, o2) -> (int)(o1.marks - o2.marks));
+Arrays.sort(list, (o1, o2) -> Float.compare(o1.marks, o2.marks));
 
 // Sort descending by marks:
 Arrays.sort(list, (o1, o2) -> (int)(o2.marks - o1.marks));
 
 // Sort by roll number instead:
-Arrays.sort(list, (o1, o2) -> o1.rollno - o2.rollno);
+Arrays.sort(list, (o1, o2) -> Integer.compare(o1.rollno, o2.rollno));
 ```
 
 ---
@@ -469,7 +467,7 @@ Arrays.sort(list, (o1, o2) -> o1.rollno - o2.rollno);
 | **Sorting Logic** | Single, **Natural ordering** | Multiple, **Custom orderings** |
 | **Modifies Class?** | **Yes** (class must implement it) | **No** (can be defined externally) |
 | **Sorting Call** | `Arrays.sort(list)` | `Arrays.sort(list, comparator)` |
-| **Lambda Support** | No | **Yes** (it is a `@FunctionalInterface`) |
+| **Lambda Support** | **Yes** (it is a functional interface) | **Yes** (it is a functional interface) |
 
 # Part 4: Lambda Functions & Functional Interfaces
 
@@ -563,8 +561,8 @@ interface Operation {
 }
 ```
 
-* **What makes this a Functional Interface?** It contains **exactly ONE abstract method** (`operation(int a, int b)`).
-* Because it has only one method, the compiler knows that any 2-parameter lambda expression assigned to `Operation` is the implementation of `operation(int a, int b)`.
+* **What makes this a Functional Interface?** It has exactly **one abstract method** (`operation(int a, int b)`).
+* Because it is a functional interface, a compatible lambda expression can be used where an `Operation` is expected. The compiler uses the interface's single abstract method as the lambda's target method.
 
 ---
 
@@ -594,7 +592,7 @@ private int operate(int a, int b, Operation op) {
 ```
 
 * Look at the third parameter: `Operation op`.
-* Instead of passing just data, **we are passing behavior (code/logic) into a method!**
+* Instead of passing only data, **we are passing an object representing behavior into a method!**
 * When we call:
   ```java
   myCalculator.operate(5, 3, sum);
@@ -662,7 +660,7 @@ int compare(T o1, T o2);
 | Return Value | Meaning | Sorting Effect (Ascending) |
 | :--- | :--- | :--- |
 | **Negative (`< 0`)** | `o1` is smaller than `o2` | `o1` placed **before** `o2` |
-| **Zero (`0`)** | `o1` is equal to `o2` | Position remains unchanged |
+| **Zero (`0`)** | `o1` is equivalent to `o2` according to the comparator | They compare as tied; a stable sorting algorithm preserves their relative order |
 | **Positive (`> 0`)** | `o1` is greater than `o2` | `o1` placed **after** `o2` |
 
 ---
@@ -690,7 +688,7 @@ public class Student implements Comparable<Student> {
     // Default natural ordering by marks
     @Override
     public int compareTo(Student o) {
-        return (int)(this.marks - o.marks);
+        return Float.compare(this.marks, o.marks);
     }
 }
 ```
@@ -721,7 +719,7 @@ public class Main {
         Arrays.sort(list, new Comparator<Student>() {
             @Override
             public int compare(Student o1, Student o2) {
-                return (int)(o1.marks - o2.marks); // Ascending by marks
+                return Float.compare(o1.marks, o2.marks); // Ascending by marks
             }
         });
         System.out.println("Ascending by marks (Anonymous class):");
@@ -731,7 +729,7 @@ public class Main {
         // Approach 2: Lambda Expression (Ascending by marks)
         // -------------------------------------------------------------
         // Since Comparator has only ONE abstract method (compare), we can use a lambda:
-        Arrays.sort(list, (o1, o2) -> (int)(o1.marks - o2.marks));
+        Arrays.sort(list, (o1, o2) -> Float.compare(o1.marks, o2.marks));
         System.out.println("\nAscending by marks (Lambda):");
         System.out.println(Arrays.toString(list));
 
@@ -739,8 +737,8 @@ public class Main {
         // Approach 3: Descending Order (Highest marks first)
         // -------------------------------------------------------------
         // Negating the difference -(o1 - o2) OR swapping operands (o2 - o1):
-        Arrays.sort(list, (o1, o2) -> -(int)(o1.marks - o2.marks));
-        // Equivalent: Arrays.sort(list, (o1, o2) -> (int)(o2.marks - o1.marks));
+        Arrays.sort(list, (o1, o2) -> Float.compare(o2.marks, o1.marks));
+        // Equivalent descending form: Arrays.sort(list, (o1, o2) -> -Float.compare(o1.marks, o2.marks));
         System.out.println("\nDescending by marks:");
         System.out.println(Arrays.toString(list));
 
@@ -748,7 +746,7 @@ public class Main {
         // Approach 4: Custom Sorting by Roll Number (Different Attribute)
         // -------------------------------------------------------------
         // Student class compareTo sorts by marks, but we can override this externally:
-        Arrays.sort(list, (o1, o2) -> o1.rollno - o2.rollno);
+        Arrays.sort(list, (o1, o2) -> Integer.compare(o1.rollno, o2.rollno));
         System.out.println("\nAscending by Roll Number:");
         System.out.println(Arrays.toString(list));
 
@@ -780,12 +778,11 @@ Ascending by Roll Number:
 ### 5. Floating-Point Precision Warning in `(int)(o1.marks - o2.marks)`
 
 > [!WARNING]
-> Notice the cast `(int)(o1.marks - o2.marks)`:
-> If `o1.marks = 89.9f` and `o2.marks = 89.2f`, the difference is `0.7f`.
-> Casting `(int) 0.7f` truncates it to **`0`**, meaning Java will wrongly treat them as **equal**!
+> Avoid implementing a comparator by subtracting floating-point values and casting the result to `int`.
+> For example, if `o1.marks = 89.9f` and `o2.marks = 89.2f`, the difference is about `0.7f`; casting it to `int` produces `0`, incorrectly treating the values as tied.
 >
 > **Best Practice for Floats/Doubles:**
-> Use `Float.compare()` or `Double.compare()` instead of manual subtraction and casting:
+> Use `Float.compare()` or `Double.compare()`:
 > ```java
 > Arrays.sort(list, (o1, o2) -> Float.compare(o1.marks, o2.marks));
 > ```
@@ -802,3 +799,10 @@ Ascending by Roll Number:
 | **Source Modification** | Must edit the class source code | No need to touch the class source code |
 | **Calling Syntax** | `Arrays.sort(list);` | `Arrays.sort(list, comparator);` |
 | **Lambda Support** | ❌ No | ✅ Yes (`(o1, o2) -> ...`) |
+
+
+---
+
+## Verification Note
+
+This file currently contains material on amortized analysis, dynamic arrays, generics, `Comparable`, `Comparator`, lambdas, and functional interfaces. Despite the filename `generics_exceptionHandling.md`, **no exception-handling section is present in the supplied content**, so no exception-handling material has been invented or added here.

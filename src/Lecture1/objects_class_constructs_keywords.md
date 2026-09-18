@@ -10,9 +10,9 @@ class Student {
 }
 ```
 
-`Student` is a class. A class is a blueprint or template used to create
-objects. It groups related data and, when needed, the functions that operate
-on that data.
+`Student` is a class. A class is a type definition that describes the state and behavior that
+objects of that type can have. It groups related data (fields) and behavior
+(methods) into one unit.
 
 ## Fields in This Class
 
@@ -24,43 +24,58 @@ The class contains three fields (also called attributes or properties):
 | `marks` | `float[]` | Stores marks | 5 |
 | `name` | `String[]` | Stores student names | 5 |
 
-Each `new ...[5]` expression creates an array with five positions. The arrays
-are initialized when a `Student` object is created.
+Each `new ...[5]` expression creates an array object with five positions.
+Because these are instance-field initializers, each `Student` object gets its
+own three array objects when the `Student` object is initialized.
 
 ## Class vs. Object
 
-- A **class** is a logical definition or template.
-- An **object** is an instance created from that class and occupies memory.
-- The class describes the fields; an object stores the actual values in those
-	fields.
+- A **class** is a type definition that describes the structure and behavior
+  that objects of that type can have.
+- An **object** is a runtime entity created from a class (or, for arrays, from
+  an array type).
+- An object has its own instance state, so different objects can have different
+  values in their instance fields.
 
-For example, this creates one `Student` object:
+For example:
 
 ```java
 Student student = new Student();
 ```
-A class is a blueprint for creating objects. It defines the properties (attributes) and behaviors (methods) that the objects created from the class will have. In this case, the Student class has three properties: rno (roll number), marks, and name, which are arrays that can hold information for up to 5 students.
 
-CLASS -> LOGICAL CONSTRUCT || OBJECT -> PHYSICAL ENTITY (takes up memory)
+This creates one `Student` object and stores a reference to that object in the
+local variable `student`.
 
-The current class only defines data fields. It does not yet declare any
-methods, constructors, or objects.
+In this example, each `Student` object has three array fields. Each array has
+five elements.
 
-## 3 essenstial properties of an object
-* **state of the object** -> The state of an object is represented by the values of its attributes. 
+```text
+CLASS -> TYPE DEFINITION
+OBJECT -> RUNTIME ENTITY WITH STATE
+```
+
+The current `Student` class defines data fields but does not declare any
+methods or constructors explicitly.
+
+## 3 essential properties of an object
+* **State of the object** -> The state of an object is represented by the values of its instance fields (and, more generally, the values that make up its observable state). 
 
 For example, a Student object may have a roll number of 1, marks of 85.5, and a name of "John Doe". These values define the current state of that particular Student object.
 
-* **Identity of the object** -> The identity of an object is a unique identifier that distinguishes it from other objects. 
+* **Identity of the object** -> Object identity distinguishes one object from another.
 
-In Java, every object has a unique identity, which is typically represented by its memory address. Even if two objects have the same state (i.e., the same values for their attributes), they are considered different objects if they have different identities.
+In Java, object identity is not defined as a memory address. Two distinct objects
+can contain identical state and still be different objects. The `==` operator
+compares references for identity when its operands are reference types.
 
 * **Behavior of the object** -> The behavior of an object is defined by the methods that can be called on it. These methods define what actions the object can perform and how it can interact with other objects. 
 
 For example, a Student object may have methods to calculate the average marks, display student information, or update the student's name. 
 
-## 4. DOT operator / seperator in JAVA
-	The dot operator (.) is used to link the reference variable of an object to its fields and methods. It allows us to access the attributes and behaviors of an object.
+## 4. DOT operator / separator in JAVA
+	The dot (`.`) operator is used for member access. It can be used with an
+object/reference expression to access accessible instance fields and methods,
+and with a class name to access accessible static members.
 
 For example, if we have a Student object named student, we can access its fields like this:
 ```java
@@ -68,31 +83,65 @@ student.rno[0] = 1;
 student.marks[0] = 85.5f;
 student.name[0] = "John Doe";
 ```
-* **Instance variables** -> Variables inside the object are called instance variables. Each object has its own copy of these variables, and they can hold different values for different objects.
+* **Instance variables** -> Instance variables are non-`static` fields. Each
+object has its own set of instance fields, so different objects can have
+different values for them.
 
-## 5. NEW keyword:
-The `new` keyword is used to create an instance of a class. It allocates memory for the object and calls the constructor to initialize it.
+## 5. `new` keyword
 
-`Student student1` -> declaring reference variable (student1) to object (Student)
-* but it does not yet create the object in memory. It only creates a reference variable that can point to an object of type Student. It is kept in **stack memory**.
+The `new` operator is used to create a new object or array and obtain a
+reference to it. For a class object, initialization includes running instance
+field initializers and then the appropriate constructor.
 
-**`new` operator dynamically allocates memory for the object in **heap memory** and returns a reference to the newly created object.**
+```java
+Student student1;
+```
 
-### Hence, all class objects in java must be created dynamically using the `new` keyword.
+This declares a local reference variable named `student1`; it does **not**
+create a `Student` object. A local variable of reference type must be assigned
+a value before it is read.
+
+> **Memory note:** It is common to visualize local variables and references as
+> being on the stack and objects as being on the heap. However, the Java
+> Language Specification does not require this particular memory layout. JVM
+> implementations may optimize allocation and storage.
 
 ```java
 Student student = new Student();
 ```
-Left side happens during  **compile time** and right side happens during **runtime**.
+
+Conceptually, the declaration and type checking are handled by the compiler,
+while the `new Student()` expression creates and initializes the object when
+the program executes.
+
+> **Important:** Do not memorize "every class object must be created with
+> `new`." `new` is the normal explicit object-creation syntax, but Java also
+> has other mechanisms through which objects can come into existence, such as
+> deserialization, cloning, reflection, boxing, and JVM-created objects.
 
 ## 6. `Student()` -> Constructor
-The `Student()` part of the expression is a constructor. A constructor is a special method that is called when an object is created. It initializes the object's state and can take parameters to set initial values for the object's attributes.
 
-Basically defines what happens when an object is created. In this case, the constructor initializes the arrays for roll numbers, marks, and names. (data allocation)
+The `Student()` part of an expression is a constructor invocation. A
+constructor is a special class member used to initialize a newly created
+object. A constructor has the same name as its class and **no return type**,
+not even `void`.
 
-`Student Rick = new Student(17, "Rick", 90.5f);`
+For example:
 
-Now a fucntion by default has some arguments, but a constructor has no return type. It is used to initialize the object when it is created.
+```java
+Student student = new Student(17, "Rick", 90.5f);
+```
+
+This invokes the `Student(int, String, float)` constructor if that constructor
+exists.
+
+A constructor can have parameters, and constructor overloading allows a class
+to provide multiple constructors with different parameter lists.
+
+> In the earlier `Student` example, the arrays are created by the instance
+> field initializers (`new int[5]`, etc.). A constructor can initialize or
+> modify fields, but it is not accurate to say that the constructor itself is
+> necessarily responsible for allocating every field object.
 
 #### What if we create our own constructor?
 
@@ -112,9 +161,9 @@ class Student {
 }
 ```
 
-The constructor has the same name as the class and has no return type. The
-`this` keyword refers to the current object. It is useful when a constructor
-parameter has the same name as an instance variable:
+A constructor has the same name as its class and has no return type. The
+`this` keyword refers to the current object. It is especially useful when a
+constructor parameter has the same name as an instance field:
 
 ```java
 this.rno = rno;
@@ -170,9 +219,9 @@ class Student {
 }
 ```
 
-`this(...)` calls another constructor in the same class. It must be the first
-statement in the constructor. This is called constructor overloading because
-the class has multiple constructors with different parameter lists:
+`this(...)` invokes another constructor in the same class. It must be the
+first statement in the constructor. A class having multiple constructors with
+different parameter lists is called **constructor overloading**:
 
 ```java
 Student emptyStudent = new Student();
@@ -181,8 +230,10 @@ Student fullStudent = new Student(17, "Rick", 90.5f);
 
 ### Copy constructor
 
-Java does not automatically provide a copy constructor, but we can create one
-that initializes a new object using another `Student` object:
+Java does not automatically provide a special copy-constructor mechanism.
+However, you can define a constructor that accepts another object of the same
+class and uses it to initialize a new object. This is commonly called a
+**copy constructor**:
 
 ```java
 class Student {
@@ -205,8 +256,11 @@ Student original = new Student(17, "Rick", 90.5f);
 Student copy = new Student(original);
 ```
 
-`original` and `copy` are two different objects. The copy constructor gives
-the new object the same initial state as the original object.
+`original` and `copy` are two different objects. This copy constructor copies
+the values of the three fields into the new object. Because `String` is
+immutable, sharing the same `String` reference is normally harmless here. For
+mutable reference-type fields, this style would be a **shallow copy** unless
+the referenced objects are copied as well.
 
 ### Constructor overloading
 
@@ -262,109 +316,255 @@ These constructors are overloaded because their parameter lists are different:
 | `Student(int, String, float)` | Roll number, name, and marks | Creates a student with supplied values |
 | `Student(Student)` | Another `Student` object | Creates a student with copied values |
 
-* Constructor overloading is resolved at compile time. It is different from method overriding, which happens when a subclass provides a new implementation
-of an inherited method.
+* Constructor overloading is resolved at compile time based on the applicable
+constructor signatures. Constructors are not inherited and therefore cannot be
+overridden. Method overriding is a separate concept in which a subclass
+provides a new implementation of an overridable inherited instance method.
 
-### Why are primitive datatypes not implemented with `new` keyword?
-* Primitive datatypes in Java are not objects, so they cannot be instantiated with the `new` keyword. Instead, they are stored directly in memory and have default values assigned to them.
+### Why are primitive datatypes not created with the `new` keyword?
 
-* For e.g Java and Python work differently...in Python there are no primitive datatypes, everything is an object. In Java, primitive datatypes are not objects, so they cannot be instantiated with the `new` keyword. Instead, they are stored directly in memory and have default values assigned to them.
+Primitive types (`byte`, `short`, `int`, `long`, `float`, `double`, `char`,
+`boolean`) are not objects and are not instantiated with `new`.
 
-# 7. WrapperClass
-
-This is a Java class that demonstrates the use of wrapper classes.
-
-### Description
-
-The `wrapperClass` class demonstrates the use of wrapper classes in Java. Wrapper classes are used to convert primitive data types into objects. The `Integer` class, which is a wrapper class for the `int` primitive data type, is used in this example.
-
-### Usage
-
-To use the `wrapperClass` class, follow these steps:
-
-1. Create an instance of the `wrapperClass` class.
-2. Call the `swap` method with two integer values to swap them.
-3. The swapped values will be printed to the console.
-
-### Example
+For example:
 
 ```java
-public class wrapperClass {
+int x = 10;
+```
+
+For primitive **fields**, Java provides default values when the containing
+object is created. Local primitive variables do **not** receive automatic
+default values and must be assigned before they are read.
+
+Java also provides wrapper classes such as `Integer`, `Double`, and `Boolean`
+when an object representation of a primitive value is needed.
+
+Python differs in this respect: Python's built-in integers, floats, booleans,
+etc. are objects, whereas Java distinguishes primitive types from reference
+types.
+
+# 7. Wrapper Classes
+
+Java provides **wrapper classes** that represent primitive values as objects.
+
+| Primitive | Wrapper |
+| --- | --- |
+| `byte` | `Byte` |
+| `short` | `Short` |
+| `int` | `Integer` |
+| `long` | `Long` |
+| `float` | `Float` |
+| `double` | `Double` |
+| `char` | `Character` |
+| `boolean` | `Boolean` |
+
+For example:
+
+```java
+int x = 10;
+
+Integer boxed = Integer.valueOf(x); // explicit boxing
+Integer boxed2 = x;                 // autoboxing
+
+int y = boxed;                      // unboxing
+```
+
+Wrapper objects are useful when an API requires objects rather than primitive
+values, such as generic collections:
+
+```java
+ArrayList<Integer> numbers = new ArrayList<>();
+numbers.add(10); // autoboxing converts int to Integer
+```
+
+### Important: Java is pass-by-value
+
+A common beginner example is trying to swap two primitive variables inside a
+method:
+
+```java
+public class WrapperExample {
     public static void main(String[] args) {
         int a = 10;
         int b = 20;
+
         swap(a, b);
+
+        System.out.println("a = " + a); // 10
+        System.out.println("b = " + b); // 20
     }
 
     static void swap(int a, int b) {
         int temp = a;
         a = b;
         b = temp;
-        System.out.println("a = " + a + ", b = " + b);
+
+        System.out.println("Inside swap: a = " + a + ", b = " + b);
     }
 }
 ```
 
+The swap affects only the method's local copies. Java is **always
+pass-by-value**. When an object is passed to a method, the value being copied is
+the reference value. Therefore, the method can modify the referenced object's
+state, but assigning a different object to its parameter does not change the
+caller's reference.
+
+> Wrapper classes do not change Java's pass-by-value rule.
+
 # 8. `final` Keyword
-* The `final` keyword in Java is used to declare constants, prevent method overriding, and prevent inheritance of classes. 
 
-When a variable is declared as `final`, its value cannot be changed once it has been assigned. When a method is declared as `final`, it cannot be overridden by subclasses. When a class is declared as `final`, it cannot be subclassed.
+The `final` keyword is used in several contexts:
 
-E.g -> ```final  int INCREASE=2;``` -> This means that the value of `INCREASE` cannot be changed after it has been assigned.
+- A **final variable** can be assigned only once.
+- A **final method** cannot be overridden by a subclass.
+- A **final class** cannot be extended.
 
-* But it will only ensure immatability if the instance variable is of primitive datatype. If the instance variable is of reference type, then the reference cannot be changed, but the object it points to can still be modified. 
+For example:
 
-E.g -> ```final Student student = new Student();``` -> This means that the reference variable `student` cannot be changed to point to a different `Student` object, but the fields of the `Student` object it points to can still be modified.
+```java
+final int INCREASE = 2;
+```
+
+After `INCREASE` has been assigned, it cannot be assigned another value.
+
+A commonly used Java constant is declared with both `static` and `final`:
+
+```java
+static final int MAX_SIZE = 100;
+```
+
+### `final` references and immutability
+
+A `final` reference means the **reference cannot be reassigned**. It does
+**not** make the referenced object immutable.
+
+```java
+final Student student = new Student();
+
+student.name = "Rick";        // allowed if the field is accessible
+// student = new Student();  // ❌ cannot reassign the final reference
+```
+
+So:
+
+```text
+final reference != immutable object
+```
+
+For a final primitive variable, the primitive value cannot be reassigned after
+the variable has been assigned.
+
+For a final reference variable, only the reference is final. The referenced
+object may still be mutable.
 
 # 9. Garbage Collection
-* Garbage collection is the process of automatically freeing up memory by removing objects that are no longer in use. In Java, the garbage collector is responsible for identifying and removing objects that are no longer reachable from the program.
 
-* C++ does not have automatic garbage collection, so the programmer is responsible for managing memory manually using destructors. In C++, if an object is no longer needed, the programmer must explicitly delete it to free up memory. If the programmer forgets to delete an object, it can lead to memory leaks and other issues.
+Garbage collection (GC) is Java's automatic memory-management mechanism for
+reclaiming storage associated with objects that are no longer reachable by
+the program.
 
+```text
+reachable object   -> may still be used
+unreachable object -> eligible for garbage collection
+```
 
-# * Are Objects and Instnces the same thing?
-**Yes, in practical terms they refer to the exact same thing in memory (the entity created on the heap with `new`).** 
+> **Eligible** does not mean "collected immediately." Java does not guarantee
+> exactly when garbage collection will occur.
 
-However, conceptually and grammatically, there is a **subtle difference in perspective and relationship**:
+Java does not provide a general `delete` operation for ordinary objects. The
+JVM manages their reclamation automatically.
+
+### Java vs. C++
+
+C++ does not use a Java-style garbage collector for ordinary memory
+management. C++ commonly relies on deterministic object lifetimes, automatic
+storage duration, RAII, and smart pointers such as `std::unique_ptr` and
+`std::shared_ptr`.
+
+When raw dynamic allocation is used with `new`, the programmer is responsible
+for releasing the corresponding object with `delete`. C++ destructors handle
+object/resource cleanup when an object's lifetime ends; they are **not** the
+same mechanism as Java garbage collection.
+
+# * Are Objects and Instances the Same Thing?
+
+In everyday Java discussion, **object** and **instance** are often used
+interchangeably. The word "instance" emphasizes an object's relationship to a
+particular class or type.
+
+It is not accurate to define an object simply as "the entity created on the
+heap with `new`." Java does not require a particular stack/heap implementation,
+and objects can also come into existence through mechanisms other than an
+explicit `new` expression.
+
+Conceptually, an object is a runtime entity with identity and state. Calling
+it an **instance of `Dog`** emphasizes its relationship to the `Dog` class.
 
 ---
 
-### The Subtle Difference:
+### The Difference in Emphasis
 
 | Term | What it emphasizes | Perspective |
 | :--- | :--- | :--- |
-| **Object** | The **physical entity** in heap memory with state and behavior. | Self-contained entity |
-| **Instance** | The **relationship** between that object and its blueprint (the class). | Relational entity ("Instance **of**...") |
+| **Object** | A runtime entity with identity and state. | The entity itself |
+| **Instance** | The relationship between an object and a class/type. | "An instance **of** a class" |
 
 ---
 
-### Real-World Analogy:
+### Real-World Analogy
+
 Think of the words **"Person"** vs. **"Son"**:
-* A guy named Alex is a **person** (an entity/object on his own).
-* But Alex is a **son of** John (describes his *relationship* to a parent).
+
+* Alex is a **person**: this describes what Alex is.
+* Alex is a **son of John**: this describes a relationship.
 
 Similarly:
+
 ```java
 Dog myDog = new Dog();
 ```
-* `myDog` points to an **object** in heap memory.
-* `myDog` is an **instance of** the `Dog` class (and also an instance of `Animal`, via inheritance).
+
+* `myDog` refers to a **`Dog` object**.
+* That object is an **instance of `Dog`**.
+* If `Dog extends Animal`, the same object can also be described as an
+  instance of `Animal`.
 
 ---
 
-### In Java's Language:
-Java itself emphasizes this relationship with the **`instanceof`** keyword:
+### In Java's Language
+
+Java provides the `instanceof` operator for testing whether an object is
+compatible with a particular reference type:
+
 ```java
 Circle c = new Circle();
 
 System.out.println(c instanceof Circle); // true
-System.out.println(c instanceof Shapes); // true (because Circle inherits from Shapes)
+System.out.println(c instanceof Shapes); // true, if Circle extends Shapes
 ```
-Here, `c` is **one single object**, but it is an **instance of both `Circle` and `Shapes`**.
+
+Here, `c` refers to **one object**. That object is an instance of `Circle`,
+and because `Circle` is a subtype of `Shapes`, it can also be treated as an
+instance of `Shapes`.
+
+If the reference is `null`, `instanceof` evaluates to `false`:
+
+```java
+Circle c = null;
+System.out.println(c instanceof Circle); // false
+```
 
 ---
 
 ### Summary
-* **Every instance is an object.**
-* **Every object is an instance of some class.**
-* In daily conversations and code reviews, developers use **object** and **instance** interchangeably.
+
+* In ordinary Java terminology, an **instance is an object considered in
+  relation to a class/type**.
+* "Object" and "instance" are often used interchangeably when discussing
+  ordinary class instances.
+* An array is also an object in Java, even though arrays are not declared by
+  ordinary class declarations. Therefore, avoid the absolute statement
+  "every object is an instance of some class."
+* `instanceof` checks runtime type compatibility. For a `null` reference, it
+  evaluates to `false`.
