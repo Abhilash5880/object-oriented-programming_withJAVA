@@ -66,4 +66,8 @@ public class TextADT {
             System.out.print(chars[i] + " ");
         }
     }
+    @Override
+    public String toString() {
+        return new String(chars, 0, length);
+    }
 }
