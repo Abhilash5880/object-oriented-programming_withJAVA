@@ -1,7 +1,7 @@
 package Lecture7;
 
 public class week {
-    enum Week implements A{
+    public enum Week implements A{
         Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday;
         // these are enum constants
         // public, static and final

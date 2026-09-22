@@ -392,7 +392,7 @@ public classs Singleton {
 ```java
 package Lecture2.singleton;
 
-public classs Main {
+public class Main {
     public static void main(String[] args) {
         // ❌ COMPILE ERROR: The constructor Singleton() is not visible
         // Singleton test = new Singleton();
